@@ -1,0 +1,25 @@
+{
+  "name": "payments-sdk-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build" : "./node_modules/.bin/tsc",
+    "clean": "rm -rf ./dist",
+    "cleanbuild": "rm -rf ./dist && ./node_modules/.bin/tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shubhamnegi/payments-sdk-core.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shubhamnegi/payments-sdk-core/issues"
+  },
+  "homepage": "https://github.com/Shubhamnegi/payments-sdk-core#readme",
+  "devDependencies": {
+    "typescript": "^4.3.2"
+  }
+}
