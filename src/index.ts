@@ -1,4 +1,4 @@
-import { PaytmIntegration } from "./Integrations/PaytmIntegration"
+import { PaytmIntegration } from "./Integrations/Paytm/PaytmIntegration"
 
 const Integrations = {
     PaytmIntegration

@@ -24,6 +24,12 @@
   },
   "homepage": "https://github.com/Shubhamnegi/payments-sdk-core#readme",
   "devDependencies": {
+    "@types/bunyan": "^1.8.6",
     "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bunyan": "^1.8.15",
+    "paytmchecksum": "github:paytm/Paytm_Node_Checksum"
   }
 }
