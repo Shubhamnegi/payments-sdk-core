@@ -134,7 +134,7 @@ describe("Paytm Builder test suite", () => {
         expect(result.data.body.resultInfo).to.haveOwnProperty('resultStatus');
     }).timeout(60000)
 
-    it("should be able to get refund order", async () => {
+    it("should be able to refund order", async () => {
         builder.setOrderId(orderId);
         builder.setTxnId("sometxn");
         builder.setRefundAmount("100")
