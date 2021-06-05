@@ -8,7 +8,14 @@ import {
     PaytmErrorRefundFailed,
     PaytmErrorRefundStatusCheckFailed
 } from "./PaytmErrors";
-import { PaytmCustomerInfo } from "./PaytmInterface";
+import {
+    PaytmCustomerInfo,
+    PaytmResponse,
+    PaytmInitTransactionResponse,
+    PaytmTransactionStatusResponse,
+    PaytmRefundResponse,
+    PaytmRefundStatusResponse
+} from "./PaytmInterface";
 import * as PaytmChecksum from 'paytmchecksum';
 import * as Bunyan from "bunyan"
 import { getLogger } from "../../Helpers/CustomLogger";
@@ -101,7 +108,7 @@ export class PaytmIntegration {
         const ep = `/theia/api/v1/initiateTransaction?mid=${this.mid}&orderId=${orderId}`;
 
         // request paytm to create order
-        let result;
+        let result: axios.AxiosResponse<PaytmResponse<PaytmInitTransactionResponse>>;
         try {
             result = await axios.default.post(this.baseurl + ep, paytmParams, {
                 headers: {
@@ -138,7 +145,7 @@ export class PaytmIntegration {
         logger.debug(paytmParams);
 
         const ep = "/v3/order/status";
-        let result;
+        let result: axios.AxiosResponse<PaytmResponse<PaytmTransactionStatusResponse>>;
 
         try {
             result = await axios.default.post(
@@ -200,9 +207,9 @@ export class PaytmIntegration {
         logger.debug(paytmParams)
 
         const ep = "/refund/apply";
-        let result;
+        let result: axios.AxiosResponse<PaytmResponse<PaytmRefundResponse>>;
         try {
-            result = axios.default.post(
+            result = await axios.default.post(
                 this.baseurl + ep,
                 paytmParams,
                 {
@@ -243,9 +250,9 @@ export class PaytmIntegration {
         logger.debug(paytmParams);
 
         const ep = "/v2/refund/status";
-        let result;
+        let result: axios.AxiosResponse<PaytmResponse<PaytmRefundStatusResponse>>;
         try {
-            result = axios.default.post(
+            result = await axios.default.post(
                 this.baseurl + ep,
                 paytmParams,
                 {

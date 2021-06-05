@@ -1,7 +1,14 @@
+import { PaytmBuilder } from "./Integrations/Paytm/PaytmBuilder";
 import { PaytmIntegration } from "./Integrations/Paytm/PaytmIntegration"
 
-const Integrations = {
+
+// Directly use the classes for the integration
+export const Integrations = {
     PaytmIntegration
 };
 
-export default Integrations;
+// This will help in building integration class and easy usage of the functions
+export const Builders = {
+    PaytmBuilder
+}
+
