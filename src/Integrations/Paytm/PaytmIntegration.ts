@@ -5,7 +5,8 @@ import {
     PaytmErrorOrderCreationFailed,
     PaytmErrorGettingPaymentStatus,
     PaytmErrorInvalidTransactionId,
-    PaytmErrorRefundFailed
+    PaytmErrorRefundFailed,
+    PaytmErrorRefundStatusCheckFailed
 } from "./PaytmErrors";
 import { PatmCustomerInfo } from "./PaytmInterface";
 import * as PaytmChecksum from 'paytmchecksum';
@@ -31,6 +32,7 @@ export class PaytmIntegration {
     private callbackUrl: string;
     private currency = "INR"
     private logger: Bunyan
+    private refundPrefix = "REFUNDID_";
 
 
     constructor(
@@ -154,6 +156,13 @@ export class PaytmIntegration {
         return result;
     }
 
+    /**
+     * To inititate refund request, This doesn't garuntee refund use getRefundStatus to check status
+     * @param orderId 
+     * @param txnId 
+     * @param refundAmount 
+     * @returns 
+     */
     async refundOrder(orderId: string, txnId: string, refundAmount: string) {
         if (!orderId) {
             // Missing order id
@@ -178,7 +187,7 @@ export class PaytmIntegration {
             "txnType": "REFUND",
             "orderId": orderId,
             "txnId": txnId,
-            "refId": "REFUNDID_" + orderId,
+            "refId": this.refundPrefix + orderId,
             "refundAmount": refundAmount,
         };
 
@@ -204,6 +213,50 @@ export class PaytmIntegration {
         } catch (error) {
             logger.error(error)
             throw new PaytmErrorRefundFailed(error)
+        }
+        return result;
+    }
+
+    /**
+     * To check refund status
+     * @param orderId 
+     * @returns 
+     */
+    async getRefundStatus(orderId: string) {
+        if (!orderId) {
+            // Missing order id
+            throw new PaytmErrorInvalidOrderId(orderId)
+        }
+        const logger = this.logger.child({ orderId })
+        const paytmParams: any = {};
+
+        paytmParams.body = {
+            "mid": this.mid,
+            "orderId": orderId,
+            "refId": this.refundPrefix + orderId,
+        };
+        const checksum = await this.generateChecksum(JSON.stringify(paytmParams.body))
+
+        paytmParams.head = {
+            "signature": checksum
+        };
+        logger.debug(paytmParams);
+
+        const ep = "/v2/refund/status";
+        let result;
+        try {
+            result = axios.default.post(
+                this.baseurl + ep,
+                paytmParams,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+        } catch (error) {
+            logger.error(error)
+            throw new PaytmErrorRefundStatusCheckFailed(error)
         }
         return result;
     }

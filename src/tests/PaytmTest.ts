@@ -43,7 +43,7 @@ describe("Paytm Test Suite", () => {
                 custId: customerId
             }
         )
-        expect(result).to.haveOwnProperty('data');    
+        expect(result).to.haveOwnProperty('data');
         expect(result.data).to.haveOwnProperty('head');
         expect(result.data).to.haveOwnProperty('body');
         expect(result.data.body).to.haveOwnProperty('txnToken');
@@ -53,11 +53,11 @@ describe("Paytm Test Suite", () => {
     it("should be able to get transaction status", async () => {
         const result = await integration.orderStatus(orderId);
 
-        expect(result).to.haveOwnProperty('data');        
+        expect(result).to.haveOwnProperty('data');
         expect(result.data).to.haveOwnProperty('head');
         expect(result.data).to.haveOwnProperty('body');
-        expect(result.data.body).to.haveOwnProperty('resultInfo');        
-        expect(result.data.body.resultInfo).to.haveOwnProperty('resultStatus');        
+        expect(result.data.body).to.haveOwnProperty('resultInfo');
+        expect(result.data.body.resultInfo).to.haveOwnProperty('resultStatus');
     }).timeout(20000)
 
     it("should be able to refund transactions", async () => {
@@ -65,7 +65,7 @@ describe("Paytm Test Suite", () => {
             orderId,
             "randomId",
             "100"
-            );
+        );
         console.log(result.data)
         expect(result).to.haveOwnProperty('data');
         expect(result.data).to.haveOwnProperty('head');
@@ -73,5 +73,19 @@ describe("Paytm Test Suite", () => {
         expect(result.data.body).to.haveOwnProperty('resultInfo');
         expect(result.data.body.resultInfo).to.haveOwnProperty('resultStatus');
     }).timeout(20000)
+
+    it("should be able to check refund status", async () => {
+        const result = await integration.getRefundStatus(
+            orderId
+        );
+
+        expect(result).to.haveOwnProperty('data');
+        expect(result.data).to.haveOwnProperty('head');
+        expect(result.data).to.haveOwnProperty('body');
+        expect(result.data.body).to.haveOwnProperty('resultInfo');
+        expect(result.data.body.resultInfo).to.haveOwnProperty('resultStatus');
+    }).timeout(20000)
+
+
 
 }).timeout(60000)
