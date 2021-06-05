@@ -8,7 +8,7 @@ import {
     PaytmErrorRefundFailed,
     PaytmErrorRefundStatusCheckFailed
 } from "./PaytmErrors";
-import { PatmCustomerInfo } from "./PaytmInterface";
+import { PaytmCustomerInfo } from "./PaytmInterface";
 import * as PaytmChecksum from 'paytmchecksum';
 import * as Bunyan from "bunyan"
 import { getLogger } from "../../Helpers/CustomLogger";
@@ -58,7 +58,7 @@ export class PaytmIntegration {
     /**
      * To register an order with paytm
      */
-    async initiateTransaction(orderId: string, txnAmount: string, customer: PatmCustomerInfo) {
+    async initiateTransaction(orderId: string, txnAmount: string, customer: PaytmCustomerInfo) {
         if (!orderId) {
             // Missing order id
             throw new PaytmErrorInvalidOrderId(orderId)
@@ -96,7 +96,7 @@ export class PaytmIntegration {
         paytmParams.head = {
             "signature": checksum
         }
-        logger.debug("Paytm Request", { paytmParams });
+        logger.debug(paytmParams);
 
         const ep = `/theia/api/v1/initiateTransaction?mid=${this.mid}&orderId=${orderId}`;
 
@@ -129,7 +129,7 @@ export class PaytmIntegration {
 
         paytmParams.body = {
             "mid": this.mid,
-            "orderId": this.mid,
+            "orderId": orderId,
         };
         const checksum = await this.generateChecksum(JSON.stringify(paytmParams.body))
         paytmParams.head = {
@@ -191,7 +191,7 @@ export class PaytmIntegration {
             "refundAmount": refundAmount,
         };
 
-        const checksum = this.generateChecksum(JSON.stringify(paytmParams.body))
+        const checksum = await this.generateChecksum(JSON.stringify(paytmParams.body))
 
         paytmParams.head = {
             "signature": checksum
