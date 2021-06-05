@@ -1,3 +1,6 @@
 declare module 'paytmchecksum' {
-    export function generateSignature(body: string, secret: string): Promise<string>
+    class PaytmChecksum {
+        static generateSignature(params: string, key: string): Promise<string>
+    }
+    export default PaytmChecksum
 }

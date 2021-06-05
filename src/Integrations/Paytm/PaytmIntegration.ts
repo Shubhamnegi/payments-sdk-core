@@ -107,7 +107,7 @@ export class PaytmIntegration {
     }
 
     async generateChecksum(data: string) {
-        const checksum = await PaytmChecksum.generateSignature(data, this.secret)
+        const checksum = await PaytmChecksum.default.generateSignature(data, this.secret)
         return checksum;
     }
 }
