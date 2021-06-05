@@ -1,4 +1,10 @@
-import { PaytmErrorInvalidAmount, PaytmErrorInvalidCustomerInfo, PaytmErrorInvalidOrderId, PaytmErrorOrderCreationFailed } from "./PaytmErrors";
+import {
+    PaytmErrorInvalidAmount,
+    PaytmErrorInvalidCustomerInfo,
+    PaytmErrorInvalidOrderId,
+    PaytmErrorOrderCreationFailed,
+    PaytmErrorGettingPaymentStatus
+} from "./PaytmErrors";
 import { PatmCustomerInfo } from "./PaytmInterface";
 import * as PaytmChecksum from 'paytmchecksum';
 import * as Bunyan from "bunyan"
@@ -97,11 +103,51 @@ export class PaytmIntegration {
                 headers: {
                     "content-type": "application/json",
                 }
-            })
-            logger.debug(result);
+            })            
         } catch (error) {
             logger.error(error)
             throw new PaytmErrorOrderCreationFailed(error);
+        }
+        return result;
+    }
+
+    /**
+     * To get transactin status from paytm
+     * This can be used to check status at multiple levels while updating data in out our database
+     * @param orderId 
+     */
+    async orderStatus(orderId: string) {
+        if (!orderId) {
+            throw new PaytmErrorInvalidOrderId(orderId);
+        }
+        const logger = this.logger.child({ orderId })
+        const paytmParams: any = {}
+
+        paytmParams.body = {
+            "mid": this.mid,
+            "orderId": this.mid,
+        };
+        const checksum = await this.generateChecksum(JSON.stringify(paytmParams.body))
+        paytmParams.head = {
+            "signature": checksum
+        };
+        logger.debug(paytmParams);
+
+        const ep = "/v3/order/status";
+        let result;
+
+        try {
+            result = await axios.default.post(
+                this.baseurl + ep,
+                paytmParams,
+                {
+                    headers: {
+                        "content-type": "application/json"
+                    }
+                });
+        } catch (error) {
+            logger.error(error);
+            throw new PaytmErrorGettingPaymentStatus(error)
         }
         return result;
     }

@@ -8,7 +8,7 @@
     "/dist"
   ],
   "scripts": {
-    "test": "./node_modules/.bin/mocha dist/tests/*",
+    "test": "./node_modules/.bin/mocha dist/tests/*.js",
     "build": "./node_modules/.bin/tsc",
     "clean": "rm -rf ./dist",
     "cleanbuild": "rm -rf ./dist && ./node_modules/.bin/tsc"

@@ -23,3 +23,8 @@ export class PaytmErrorOrderCreationFailed extends CustomError {
         super(err)
     }
 }
+export class PaytmErrorGettingPaymentStatus extends CustomError {
+    constructor(err: Error) {
+        super(err)
+    }
+}
