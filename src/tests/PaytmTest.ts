@@ -17,7 +17,7 @@ describe("Paytm Test Suite", () => {
     const PAYTM_CHANNEL_ID = process.env.PAYTM_CHANNEL_ID as string
 
     const orderId = "ORDER_ID_" + Math.ceil(Math.random() * 1000);
-    // const orderId = "ORDER_ID_429" ;
+    // const orderId = "ORDER_ID_429";
 
     const integration = new PaytmIntegration(
         PAYTM_BASEURL,
@@ -38,7 +38,7 @@ describe("Paytm Test Suite", () => {
         const customerId = "CUST_ID_" + Math.ceil(Math.random() * 100);
         const result = await integration.initiateTransaction(
             orderId,
-            100,
+            "100",
             {
                 custId: customerId
             }
@@ -52,11 +52,26 @@ describe("Paytm Test Suite", () => {
 
     it("should be able to get transaction status", async () => {
         const result = await integration.orderStatus(orderId);
-        
+
         expect(result).to.haveOwnProperty('data');        
         expect(result.data).to.haveOwnProperty('head');
         expect(result.data).to.haveOwnProperty('body');
         expect(result.data.body).to.haveOwnProperty('resultInfo');        
         expect(result.data.body.resultInfo).to.haveOwnProperty('resultStatus');        
     }).timeout(20000)
-})
+
+    it("should be able to refund transactions", async () => {
+        const result = await integration.refundOrder(
+            orderId,
+            "randomId",
+            "100"
+            );
+        console.log(result.data)
+        expect(result).to.haveOwnProperty('data');
+        expect(result.data).to.haveOwnProperty('head');
+        expect(result.data).to.haveOwnProperty('body');
+        expect(result.data.body).to.haveOwnProperty('resultInfo');
+        expect(result.data.body.resultInfo).to.haveOwnProperty('resultStatus');
+    }).timeout(20000)
+
+}).timeout(60000)

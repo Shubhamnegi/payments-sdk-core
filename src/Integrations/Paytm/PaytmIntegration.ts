@@ -3,7 +3,9 @@ import {
     PaytmErrorInvalidCustomerInfo,
     PaytmErrorInvalidOrderId,
     PaytmErrorOrderCreationFailed,
-    PaytmErrorGettingPaymentStatus
+    PaytmErrorGettingPaymentStatus,
+    PaytmErrorInvalidTransactionId,
+    PaytmErrorRefundFailed
 } from "./PaytmErrors";
 import { PatmCustomerInfo } from "./PaytmInterface";
 import * as PaytmChecksum from 'paytmchecksum';
@@ -54,7 +56,7 @@ export class PaytmIntegration {
     /**
      * To register an order with paytm
      */
-    async initiateTransaction(orderId: string, txnAmount: number | string, customer: PatmCustomerInfo) {
+    async initiateTransaction(orderId: string, txnAmount: string, customer: PatmCustomerInfo) {
         if (!orderId) {
             // Missing order id
             throw new PaytmErrorInvalidOrderId(orderId)
@@ -103,7 +105,7 @@ export class PaytmIntegration {
                 headers: {
                     "content-type": "application/json",
                 }
-            })            
+            })
         } catch (error) {
             logger.error(error)
             throw new PaytmErrorOrderCreationFailed(error);
@@ -148,6 +150,60 @@ export class PaytmIntegration {
         } catch (error) {
             logger.error(error);
             throw new PaytmErrorGettingPaymentStatus(error)
+        }
+        return result;
+    }
+
+    async refundOrder(orderId: string, txnId: string, refundAmount: string) {
+        if (!orderId) {
+            // Missing order id
+            throw new PaytmErrorInvalidOrderId(orderId)
+        }
+        if (!txnId) {
+            throw new PaytmErrorInvalidTransactionId(txnId)
+        }
+        if (
+            refundAmount === null ||
+            (typeof refundAmount === "string" && refundAmount.trim() === "")
+        ) {
+            // Missing refund amount
+            throw new PaytmErrorInvalidAmount(refundAmount)
+        }
+        const logger = this.logger.child({ orderId })
+
+        const paytmParams: any = {};
+
+        paytmParams.body = {
+            "mid": this.mid,
+            "txnType": "REFUND",
+            "orderId": orderId,
+            "txnId": txnId,
+            "refId": "REFUNDID_" + orderId,
+            "refundAmount": refundAmount,
+        };
+
+        const checksum = this.generateChecksum(JSON.stringify(paytmParams.body))
+
+        paytmParams.head = {
+            "signature": checksum
+        };
+
+        logger.debug(paytmParams)
+
+        const ep = "/refund/apply";
+        let result;
+        try {
+            result = axios.default.post(
+                this.baseurl + ep,
+                paytmParams,
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+        } catch (error) {
+            logger.error(error)
+            throw new PaytmErrorRefundFailed(error)
         }
         return result;
     }
